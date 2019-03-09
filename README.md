@@ -1,6 +1,27 @@
 K780 Function Key Switcher
 ==========================
 
+A new cleaner system has been invented!
+
+A simple udev rule:
+
+    SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c52b", RUN+="/usr/sbin/keyswitch"
+
+coupled with a tiny little script /usr/sbin/keyswitch:
+
+    #!/bin/bash
+
+    if [ "x$ACTION" = "xadd" ]; then
+        printf '\x10\x02\x0c\x10\x00\x00\x00' > $DEVNAME
+    fi
+
+is all that is needed!
+
+----
+
+Everything below this line is the old experimental system
+=========================================================
+
 Crude program to send the codes to switch the functionality
 of the K780 (and probably other Logitech keyboards too) function
 keys.
