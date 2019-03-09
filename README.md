@@ -33,6 +33,9 @@ You can also select the first device found using a VID and PID:
 
 It defaults to the first device with the standard 046d:c52b VID/PID pair found.
 
+You can also add the `-n` flag to send a destop notification through `notify-send`. This is useful if you bind the program
+to key combinations to switch between modes.
+
 ----
 
 **Historical notes and musings**
