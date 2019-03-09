@@ -34,3 +34,6 @@ and any other device on the same receiver inoperable. A new request
 to bind the device is then made through /sys/bus/usb/devices/usbhid/bind
 but it's far from a good system. A method needs to be found to send the
 output reports without having to unbind the device from the driver.
+
+The ideal situation would be for Solaar to implement the ability to
+send these codes.
