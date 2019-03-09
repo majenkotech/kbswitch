@@ -6,7 +6,7 @@ use Getopt::Std;
 
 my %opts;
 
-getopts('d:v:p:fm', \%opts);
+getopts('d:v:p:fmn', \%opts);
 
 my $device = $opts{'d'};
 if (!$device) {
@@ -27,6 +27,9 @@ if ($opts{'f'}) {
     open(F, ">/dev/$hidraw") || die("Unable to open /dev/$hidraw");
     print(F "\x10\x02\x0c\x1c\x00\x00\x00");
     close(F);
+    if ($opts{'n'}) {
+        system("notify-send 'Logitech K780' 'Function keys selected'");
+    }
     print "Function keys selected\n";
     exit(0);
 }
@@ -34,14 +37,12 @@ if ($opts{'m'}) {
     open(F, ">/dev/$hidraw") || die("Unable to open /dev/$hidraw");
     print(F "\x10\x02\x0c\x1c\x01\x00\x00");
     close(F);
+    if ($opts{'n'}) {
+        system("notify-send 'Logitech K780' 'Media keys selected'");
+    }
     print "Media keys selected\n";
     exit(0);
 }
-
-
-
-
-
 
 print "$hidraw\n";
 
