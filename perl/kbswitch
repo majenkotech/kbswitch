@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Getopt::Std;
+
+my %opts;
+
+getopts('d:v:p:fm', \%opts);
+
+my $device = $opts{'d'};
+if (!$device) {
+    my $vid = $opts{'v'} || "046d";
+    my $pid = $opts{'p'} || "c52b";
+
+    $device = findDevice($vid, $pid);
+
+}
+
+my $hidraw = findHidRaw($device);
+
+if (!$hidraw) {
+    die("Unable to find Unifying Receiver");
+}
+
+if ($opts{'f'}) {
+    open(F, ">/dev/$hidraw") || die("Unable to open /dev/$hidraw");
+    print(F "\x10\x02\x0c\x1c\x00\x00\x00");
+    close(F);
+    print "Function keys selected\n";
+    exit(0);
+}
+if ($opts{'m'}) {
+    open(F, ">/dev/$hidraw") || die("Unable to open /dev/$hidraw");
+    print(F "\x10\x02\x0c\x1c\x01\x00\x00");
+    close(F);
+    print "Media keys selected\n";
+    exit(0);
+}
+
+
+
+
+
+
+print "$hidraw\n";
+
+sub findHidRaw($) {
+    my $device = shift;
+
+    opendir(DIR, "/sys/bus/usb/devices/$device");
+    while (my $file = readdir(DIR)) {
+        if (substr($file, 0, length($device) + 1) eq "$device:") {
+            opendir(SUBDIR, "/sys/bus/usb/devices/$device/$file");
+            while (my $subfile = readdir(SUBDIR)) {
+                if ($subfile =~ /^[0-9A-F]{4}:[0-9A-F]{4}:[0-9A-F]{4}\.[0-9A-F]{4}$/) {
+                    if (-d "/sys/bus/usb/devices/$device/$file/$subfile/hidraw") {
+                        opendir(HIDDIR, "/sys/bus/usb/devices/$device/$file/$subfile/hidraw");
+                        while (my $hidfile = readdir(HIDDIR)) {
+                            if ($hidfile =~ /^hidraw\d+$/) {
+                                closedir(HIDDIR);
+                                closedir(SUBDIR);
+                                closedir(DIR);
+                                return $hidfile;
+                            }
+                        }
+                        closedir(HIDDIR);
+                    }
+                }
+            }
+            closedir(SUBDIR);
+        }
+    }
+    closedir(DIR);
+    return undef;
+}
+
+sub findDevice($$) {
+    my $vid = shift;
+    my $pid = shift;
+
+    opendir(DIR, "/sys/bus/usb/devices");
+    while (my $file = readdir(DIR)) {
+        if (-f "/sys/bus/usb/devices/$file/idVendor") {
+            open(F, "/sys/bus/usb/devices/$file/idVendor") || continue;
+            my $testVid = <F>;
+            close(F);
+            chomp($testVid);
+            open(F, "/sys/bus/usb/devices/$file/idProduct") || continue;
+            my $testPid = <F>;
+            close(F);
+            chomp($testPid);
+
+            if ((lc($vid) eq lc($testVid)) && (lc($pid) eq lc($testPid))) {
+                closedir(DIR);
+                return $file;
+            }
+        }
+    }
+
+    closedir(DIR);
+    return undef;
+}
