@@ -1,6 +1,47 @@
 K780 Function Key Switcher
 ==========================
 
+This is a small perl program for switching between media keys and function keys on the Logitech K780 keyboard.
+
+Rather annoyingly this superb keyboard defaults to the function keys operating as media keys, and Logitech refuse
+to even acknowledge that Linux even exists!
+
+Also Solaar doesn't (yet) support this keyboard any further than simply pairing it with the unified receiver.
+
+So after some reverse engineering of the protocol this little program was born.
+
+It simply sends the USB HID Output Report for switching between media keys and function keys, and nothing else.  In
+the future it may be expanded to perform other functions.
+
+Usage:
+
+Select media keys:
+
+    kbswitch -m
+
+Select function keys:
+
+    kbswitch -f
+
+If you have multiple unifying receivers you can select it with a device path:
+
+    kbswitch -d 1-1.6 -f
+
+You can also select the first device found using a VID and PID:
+
+    kbswitch -v 046d -p c52b -f
+
+It defaults to the first device with the standard 046d:c52b VID/PID pair found.
+
+----
+
+**Historical notes and musings**
+
+----
+
+
+
+
 A new cleaner system has been invented!
 
 A simple udev rule:
